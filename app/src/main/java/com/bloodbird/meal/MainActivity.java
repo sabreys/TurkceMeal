@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView play, stop;
     Spinner  spinner1;
     MediaPlayer mediaPlayer;
+    Switch switch1;
 
     Sure currentSure;
     Sures[] sures;
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = this;
         text = findViewById(R.id.text);
-
+        switch1=findViewById(R.id.switch1);
 
         play = findViewById(R.id.play);
         stop = findViewById(R.id.stop);
@@ -111,10 +113,13 @@ public class MainActivity extends AppCompatActivity {
         }
         try {
             mediaPlayer=new MediaPlayer();
-            mediaPlayer.setDataSource(getApplicationContext(), myUri);
+            mediaPlayer.setDataSource(context, myUri);
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.prepare(); //don't use prepareAsync for mp3 playback
             mediaPlayer.start();
+            if(!switch1.isSelected()) {
+                mediaPlayer.pause();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -216,10 +221,14 @@ public class MainActivity extends AppCompatActivity {
                                 Sure sure = gson.fromJson(String.valueOf(obj), Sure.class);
                                 currentSure = sure;
                                 for (int i = 0; i < sure.verse_count; i++) {
-                                    text.append(i + ": " + sure.verses.get(i).translation.text + "\n");
+                                    text.append(i + ": " + sure.verses.get(i).translation.text + "\n \n");
                                 }
 
-                                play_mp3(sure.audio.mp3);
+                              //  play_mp3(sure.audio.mp3); FIXME
+
+
+
+
 
 
                             } catch (JSONException e) {
