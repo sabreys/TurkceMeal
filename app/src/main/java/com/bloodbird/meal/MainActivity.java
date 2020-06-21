@@ -40,7 +40,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     TextView text;
     Button button;
-    EditText sure_no;
+
     Context context;
     ImageView play, stop;
     Spinner  spinner1;
@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = this;
         text = findViewById(R.id.text);
-        button = findViewById(R.id.button);
-        sure_no = findViewById(R.id.sayi);
+
+
         play = findViewById(R.id.play);
         stop = findViewById(R.id.stop);
         sure_name=new String[114];
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         mediaPlayer = new MediaPlayer();
 
-        button.setOnClickListener(araButonListener);
+
 
         play.setOnClickListener(playButtonListener);
         stop.setOnClickListener(stopButtonListener);
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    View.OnClickListener araButonListener = new View.OnClickListener() {
+   /* View.OnClickListener araButonListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             text.setText("");
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             asyncTask.execute(sure_no.getText().toString());
         }
     };
-
+*/
     View.OnClickListener playButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {

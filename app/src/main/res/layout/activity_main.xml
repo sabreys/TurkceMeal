@@ -7,21 +7,6 @@
     android:background="#515151"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/sayi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="Sure Numarası"
-        android:inputType="number"
-        android:paddingBottom="5dp"
-        android:textColor="#959595"
-        android:textColorHint="#C6C6C6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="409dp"
@@ -41,7 +26,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sayi" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -66,18 +51,5 @@
                 android:textColor="#E3E2E2" />
         </LinearLayout>
     </ScrollView>
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="40dp"
-        android:text="Ara"
-        app:layout_constraintBottom_toBottomOf="@+id/sayi"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.596"
-        app:layout_constraintStart_toEndOf="@+id/sayi"
-        app:layout_constraintTop_toTopOf="@+id/sayi"
-        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
