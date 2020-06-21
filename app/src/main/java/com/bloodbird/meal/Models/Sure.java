@@ -7,6 +7,7 @@ public class Sure {
      public  String name,slug;
      public  Verses zero;
      public List<Verses> verses;
+     public Audio audio;
 
      public int getId() {
           return id;
