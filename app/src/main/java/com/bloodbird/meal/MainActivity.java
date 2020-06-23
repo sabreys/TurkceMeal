@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -38,8 +37,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView play, stop;
     Spinner spinner1;
     MediaPlayer mediaPlayer;
+    boolean playrequest = false;
     Switch switch1;
     MDatabase db;
     Sure currentSure;
@@ -97,7 +95,11 @@ public class MainActivity extends AppCompatActivity {
     View.OnClickListener playButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            playrequest = true;
             mediaPlayer.start();
+            if (mediaPlayer.isPlaying())
+                playrequest = false;
+
         }
     };
 
@@ -109,35 +111,37 @@ public class MainActivity extends AppCompatActivity {
     };
 
     void play_mp3(final String uri) {
-        new Runnable(){
+        new Runnable() {
 
             @Override
             public void run() {
                 Uri myUri = Uri.parse(uri);
 
-                if(mediaPlayer == null){
+                if (mediaPlayer == null) {
                     mediaPlayer = new MediaPlayer();
                 }
-                if (mediaPlayer!=null) {
+                if (mediaPlayer != null) {
                     mediaPlayer.stop();
                     mediaPlayer.reset();
 
-                    mediaPlayer= null;
+                    mediaPlayer = null;
 
                 }
                 try {
-                     mediaPlayer = new MediaPlayer();
+                    mediaPlayer = new MediaPlayer();
                     mediaPlayer.setDataSource(context, myUri);
                     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                     mediaPlayer.prepareAsync();
                     mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                         @Override
                         public void onPrepared(MediaPlayer mediaPlayer) {
+
                             mediaPlayer.start();
 
-                            if (!switch1.isChecked()) {
+                            if (!switch1.isChecked() && !playrequest) {
                                 mediaPlayer.pause();
                             }
+                            playrequest = false;
                         }
                     });
 
@@ -156,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             text.setText("");
             GetSurah asyncTask = new GetSurah();
             asyncTask.execute(i + 1 + "");
-            ((TextView) adapterView.getChildAt(0)).setTextColor(Color.WHITE);
+            ((TextView) adapterView.getChildAt(0)).setTextColor(Color.GRAY);
         }
 
         @Override
@@ -165,8 +169,28 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    void spinnerSet() {
+        runOnUiThread(new Runnable() {
 
-    class GetSurah extends AsyncTask<String, Integer,  List<VerseDb>> {
+            @Override
+            public void run() {
+
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>
+                        (context, android.R.layout.simple_spinner_item, sure_name);
+
+                dataAdapter.setDropDownViewResource
+                        (android.R.layout.simple_spinner_dropdown_item);
+
+                spinner1.setAdapter(dataAdapter);
+
+                spinner1.setOnItemSelectedListener(surahSelectListener);
+
+            }
+        });
+
+    }
+
+    class GetSurah extends AsyncTask<String, Integer, List<VerseDb>> {
 
         @Override
         protected List<VerseDb> doInBackground(String... strings) {
@@ -203,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
 
 
-                                   play_mp3(sure.audio.mp3);
+                                    play_mp3(sure.audio.mp3);
 
 
                                 } catch (JSONException e) {
@@ -244,7 +268,6 @@ public class MainActivity extends AppCompatActivity {
                     text.append((i + 1) + ": " + list.get(i).text + "\n \n");
 
 
-
                 }
                 play_mp3(currentDb.audioUrl);
             }
@@ -269,7 +292,6 @@ public class MainActivity extends AppCompatActivity {
                 String url = "https://api.acikkuran.com/surahs";
 
 
-
                 JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url, null,
 
                         new Response.Listener<JSONObject>() {
@@ -286,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
                                         JSONObject jb1 = obj.getJSONObject(i);
                                         sures[i] = new Gson().fromJson(String.valueOf(jb1), Sures.class);
 
-                                        MDatabase.getInstance(getApplicationContext()).SuresDao().insert(new SuresDb(sures[i].id,sures[i].verse_count,sures[i].pageNumber,sures[i].name,sures[i].slug,sures[i].audio.mp3));
+                                        MDatabase.getInstance(getApplicationContext()).SuresDao().insert(new SuresDb(sures[i].id, sures[i].verse_count, sures[i].pageNumber, sures[i].name, sures[i].slug, sures[i].audio.mp3));
 
                                     }
 
@@ -316,14 +338,14 @@ public class MainActivity extends AppCompatActivity {
                 );
 
                 requestQueue.add(obreq);
-            }else{
+            } else {
 
-             List<SuresDb> suresdb= MDatabase.getInstance(context).SuresDao().getSuresDb();
+                List<SuresDb> suresdb = MDatabase.getInstance(context).SuresDao().getSuresDb();
 
-             for (int i=0;i<suresdb.size();i++){
-                 sures[i]=new Sures(suresdb.get(i).id,suresdb.get(i).name);
-                 sure_name[i] = (i + 1) + ". " + sures[i].name;
-              }
+                for (int i = 0; i < suresdb.size(); i++) {
+                    sures[i] = new Sures(suresdb.get(i).id, suresdb.get(i).name);
+                    sure_name[i] = (i + 1) + ". " + sures[i].name;
+                }
 
                 spinnerSet();
 
@@ -331,24 +353,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void spinnerSet(){
-        runOnUiThread(new Runnable() {
 
-            @Override
-            public void run() {
-
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>
-                        (context, android.R.layout.simple_spinner_item, sure_name);
-
-                dataAdapter.setDropDownViewResource
-                        (android.R.layout.simple_spinner_dropdown_item);
-
-                spinner1.setAdapter(dataAdapter);
-
-                spinner1.setOnItemSelectedListener(surahSelectListener);
-
-            }
-        });
-
-    }
 }
