@@ -1,5 +1,9 @@
 package com.bloodbird.meal.Models;
 
+
+
+
+
    public class Sures {
     public int id;
     public String name;
@@ -8,9 +12,8 @@ package com.bloodbird.meal.Models;
     public Audio audio;
 
 
-
-
-
-
-
-}
+    public Sures(int id, String name) {
+     this.id = id;
+     this.name = name;
+    }
+   }

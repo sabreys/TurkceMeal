@@ -29,7 +29,7 @@
         app:srcCompat="@android:drawable/ic_media_pause" />
 
     <Switch
-        android:id="@+id/switch1"
+        android:id="@+id/otooynat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
