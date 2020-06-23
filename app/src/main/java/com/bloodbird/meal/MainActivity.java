@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     Sures[] sures;
     String[] sure_name;
     SuresDb currentDb;
+   public int YAZAR_ID=1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
             if (MDatabase.getInstance(context).SuresDao().getAyets(Integer.parseInt(strings[0])).size() == 0) {
 
                 RequestQueue requestQueue = Volley.newRequestQueue(context);
-                String url = "https://api.acikkuran.com/surah/" + strings[0] + "?author=13";
+                String url = "https://api.acikkuran.com/surah/" + strings[0] + "?author="+YAZAR_ID;
 
                 JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url, null,
 
