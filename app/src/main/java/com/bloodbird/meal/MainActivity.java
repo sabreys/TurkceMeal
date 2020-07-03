@@ -1,6 +1,7 @@
 package com.bloodbird.meal;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -17,7 +18,9 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.savedstate.SavedStateRegistry;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -28,6 +31,7 @@ import com.android.volley.toolbox.Volley;
 import com.bloodbird.meal.Database.MDatabase;
 import com.bloodbird.meal.Database.SuresDb;
 import com.bloodbird.meal.Database.VerseDb;
+import com.bloodbird.meal.Models.Author;
 import com.bloodbird.meal.Models.Sure;
 import com.bloodbird.meal.Models.Sures;
 import com.google.gson.Gson;
@@ -44,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     Button button;
 
     Context context;
-    ImageView play, stop;
+    ImageView play, stop, yazar;
     Spinner spinner1;
     MediaPlayer mediaPlayer;
     boolean playrequest = false;
@@ -53,8 +57,11 @@ public class MainActivity extends AppCompatActivity {
     Sure currentSure;
     Sures[] sures;
     String[] sure_name;
+    Author[] authors;
+    String[] author_name;
     SuresDb currentDb;
-   public int YAZAR_ID=1;
+    boolean authors_changed=false;
+   public int YAZAR_ID=13;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,18 +74,47 @@ public class MainActivity extends AppCompatActivity {
         play = findViewById(R.id.play);
         stop = findViewById(R.id.stop);
         spinner1 = (Spinner) findViewById(R.id.spinner);
-
+        yazar=findViewById(R.id.yazar);
         Log.d("deneme", "first");
 
 
         sure_name = new String[114];
         sures = new Sures[114];
+        authors=new Author[22];
+        author_name=new String[22];
+
         play.setOnClickListener(playButtonListener);
         stop.setOnClickListener(stopButtonListener);
         Log.d("deneme", (sure_name != null) + " ");
 
         GetSurahList asyncTask = new GetSurahList();
         asyncTask.execute(1 + "");
+
+        GetAuthors asyncTask2 = new GetAuthors();
+        asyncTask2.execute(1 + "");
+
+        yazar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder b = new AlertDialog.Builder(context);
+                b.setTitle("Çevirmen");
+
+
+                b.setItems(author_name, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+                        authors_changed=true;
+                        YAZAR_ID=authors[which].id;
+                    }
+
+                });
+
+                b.show();
+            }
+        });
 
 
     }
@@ -195,8 +231,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected List<VerseDb> doInBackground(String... strings) {
-
-            if (MDatabase.getInstance(context).SuresDao().getAyets(Integer.parseInt(strings[0])).size() == 0) {
+             //FIXME get ayets e bir adet yazar parametresi eklenecek. geçiçi çözümle çalışıyor
+            if (MDatabase.getInstance(context).SuresDao().getAyets(Integer.parseInt(strings[0])).size() == 0 || authors_changed) {
 
                 RequestQueue requestQueue = Volley.newRequestQueue(context);
                 String url = "https://api.acikkuran.com/surah/" + strings[0] + "?author="+YAZAR_ID;
@@ -216,7 +252,8 @@ public class MainActivity extends AppCompatActivity {
                                     currentSure = sure;
                                     for (int i = 0; i < sure.verse_count; i++) {
                                         text.append(i + ": " + sure.verses.get(i).translation.text + "\n \n");
-                                        MDatabase.getInstance(context).SuresDao().insert(
+                                        //FIXME geçici olarak kaldırıyorum. veri tabanını düzeltince açılacak
+                                     /*   MDatabase.getInstance(context).SuresDao().insert(
                                                 new VerseDb(sure.verses.get(i).id,
                                                         sure.verses.get(i).surah_id,
                                                         sure.verses.get(i).verse_number,
@@ -224,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
                                                         sure.verses.get(i).juzNumber,
                                                         sure.verses.get(i).verse,
                                                         sure.verses.get(i).transcription,
-                                                        sure.verses.get(i).translation.text));
+                                                        sure.verses.get(i).translation.text));*/
                                     }
 
 
@@ -355,4 +392,63 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    class GetAuthors extends AsyncTask<String, Integer, Void> {
+
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            getAuthorList();
+            return null;
+        }
+
+
+        void getAuthorList() {
+
+
+                RequestQueue requestQueue = Volley.newRequestQueue(context);
+                String url = "https://api.acikkuran.com/authors";
+
+
+                JsonObjectRequest obreq = new JsonObjectRequest(Request.Method.GET, url, null,
+
+                        new Response.Listener<JSONObject>() {
+
+                            // Takes the response from the JSON request
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    JSONArray obj = response.getJSONArray("data");
+
+
+                                    for (int i = 0; i < obj.length(); i++) {
+
+                                        JSONObject jb1 = obj.getJSONObject(i);
+                                        authors[i] = new Gson().fromJson(String.valueOf(jb1),Author.class);
+
+                                        author_name[i]=authors[i].name;
+                                    }
+
+
+
+
+                                } catch (JSONException e) {
+
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+
+                        new Response.ErrorListener() {
+                            @Override
+
+                            public void onErrorResponse(VolleyError error) {
+                                Log.e("Volley", "Error");
+                            }
+                        }
+                );
+
+                requestQueue.add(obreq);
+
+        }
+    }
 }

@@ -39,4 +39,17 @@
         app:layout_constraintHorizontal_bias="0.933"
         app:layout_constraintStart_toEndOf="@+id/stop"
         app:layout_constraintTop_toTopOf="@+id/stop" />
+
+    <ImageView
+        android:id="@+id/yazar"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="36dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/otooynat"
+        app:layout_constraintHorizontal_bias="0.183"
+        app:layout_constraintStart_toEndOf="@+id/stop"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@android:drawable/ic_menu_myplaces" />
 </androidx.constraintlayout.widget.ConstraintLayout>
